@@ -32,17 +32,13 @@ function Form() {
 		changedValue = "";
 	}
 
-	const TodoElements = todos.map((todo) => (
-		<Todo key={todo.id} value={todo.body.value} />
-	));
-
 	function deleteCheck(e) {
 		const item = e.target;
 		if (item.classList[0] === "deleteBtn") {
 			const todo = item.parentElement;
 			//add animation
 			todo.classList.toggle("fall");
-			RemoveItem(todo);
+			removeTodo(todo);
 			todo.addEventListener("transitionend", function () {
 				todo.remove();
 			});
@@ -54,7 +50,7 @@ function Form() {
 		}
 	}
 
-	function RemoveItem(listener) {
+	function removeTodo(listener) {
 		let todos;
 
 		if (localStorage.getItem("todos") === null) {
@@ -64,9 +60,40 @@ function Form() {
 		}
 		const todoIndex = listener.children[0].innerText;
 		todos.splice(todos.indexOf(todoIndex), 1);
-		console.log(todoIndex);
+
 		localStorage.setItem("todos", JSON.stringify(todos));
 	}
+
+	function filterTodo(e) {
+		const todos = document.querySelector("#todo-list").childNodes;
+		console.log(todos);
+		todos.forEach((todo) => {
+			switch (e.target.value) {
+				case "all":
+					todo.style.display = "flex";
+					break;
+
+				case "completed":
+					if (todo.classList.contains("completed")) {
+						todo.style.display = "flex";
+					} else {
+						todo.style.display = "none";
+					}
+					break;
+				case "active":
+					if (!todo.classList.contains("completed")) {
+						todo.style.display = "flex";
+					} else {
+						todo.style.display = "none";
+					}
+					break;
+			}
+		});
+	}
+
+	const TodoElements = todos.map((todo) => (
+		<Todo key={todo.id} value={todo.body.value} />
+	));
 
 	return (
 		<div className="container">
@@ -84,7 +111,7 @@ function Form() {
 				</button>
 
 				<div className="select">
-					<select name="todos" className="filter-todo">
+					<select name="todos" className="filter-todo" onClick={filterTodo}>
 						<option value="all">ALL</option>
 						<option value="completed">COMPLETED</option>
 						<option value="active">ACTIVE</option>
